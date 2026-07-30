@@ -20,19 +20,15 @@ namespace BudgetForecastingAPI.Controllers
         public IActionResult PredictBudget([FromBody] BudgetPredictionRequestDTO request){
 
             if(request == null || request.GecmisButceler == null || request.GecmisButceler.Count < 2){
-                return BadRequest(new {message = "Istek verisi bos olamaz ve en az 2 yila ait gecmis butce verisi gereklidir."});
+                return BadRequest(new {message = "Istek verisi bos olamaz ve en az 2 yila ait gecmis butce verisi gereklidir."} );
             }
 
             var years = request.GecmisButceler.Select(b => b.Year).ToList();
 
-            if(years.Distinct().Count() != years.Count || !years.SequenceEqual(years.OrderBy(y => y))){
-                return BadRequest(new { message = "Gecmis butce verilerinde ayni yila ait birden fazla kayit olamaz ve eskiden yeniye sirali olmalidir." });
+            if(years.Distinct().Count() != years.Count){
+                return BadRequest(new { message = "Gecmis butce verilerinde ayni yila ait birden fazla kayit olamaz."} );
             }
 
-            if(request.BeklenenEkonomikGosterge != null && request.BeklenenEkonomikGosterge.Year <= years.Last()){
-                return BadRequest(new { message = $"Beklenen butce yili ({request.BeklenenEkonomikGosterge.Year}), son gecmis yildan ({years.Last()}) buyuk olmalidir." });
-            }
-        
             try{
                 var response = _predictionService.PredictBudget(request);
                 return Ok(response);
