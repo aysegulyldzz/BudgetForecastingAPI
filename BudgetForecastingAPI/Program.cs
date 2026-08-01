@@ -7,9 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Veritabanı servisini ve SQLite bağlantısını sisteme kaydediyoruz
+// Veritabanı servisini ve PostgreSQL bağlantısını sisteme kaydediyoruz
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Katman 2: Bütçe tahmin servisini DI container'a kaydediyoruz
 builder.Services.AddScoped<IBudgetPredictionService, BudgetPredictionManager>();
