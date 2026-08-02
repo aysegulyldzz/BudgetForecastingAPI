@@ -29,6 +29,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/openapi/v1.json", "Budget Forecasting API"); });
 }
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
