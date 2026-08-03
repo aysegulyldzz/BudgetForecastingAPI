@@ -21,9 +21,13 @@ namespace BudgetForecastingAPI.Controllers
         [HttpPost("predict")]
         public async Task<IActionResult> PredictBudget([FromBody] BudgetPredictionRequestDTO request)
         {
-            // 1. Veritabanından departmanın en son gerçekleşen bütçesini çek
+            // 1. Departman ID'sini Departman İsmine Çevir
+            string[] deptNames = { "", "Operasyon / Üretim", "Satış & Pazarlama", "İnsan Kaynakları", "Finans & Muhasebe", "Bilgi Teknolojileri (IT)", "Ar-Ge", "Genel Yönetim (G&A)", "Lojistik / Tedarik Zinciri" };
+            string targetName = deptNames[request.DepartmentId];
+
+            // Veritabanından o departmanın EN SON (2025) gerçekleşen bütçesini çek
             var lastBudget = await _context.DepartmentBudgets
-                .Where(d => d.Id == request.DepartmentId)
+                .Where(d => d.DepartmentName == targetName)
                 .OrderByDescending(d => d.Year)
                 .FirstOrDefaultAsync();
 
