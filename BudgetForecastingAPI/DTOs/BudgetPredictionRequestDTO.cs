@@ -1,12 +1,15 @@
+using BudgetForecastingAPI.Enums;
 using System.Collections.Generic;
 
 namespace BudgetForecastingAPI.DTOs
 {
     public class BudgetPredictionRequestDTO
     {
-        public string DepartmentName { get; set; } = string.Empty;
-        public List<DepartmentBudgetDTO> GecmisButceler { get; set; } = new();
-        public EconomicIndicatorDTO GecmisEkonomikGosterge { get; set; } = new();
-        public EconomicIndicatorDTO BeklenenEkonomikGosterge { get; set; } = new();
+        public int DepartmentId { get; set; }
+        public int Year { get; set; }
+        public double ExpectedInflation { get; set; }
+        public double ExpectedUsdIncrease { get; set; }
+        public double ExpectedGoldIncrease { get; set; }
+        public DataSourceType DataSource { get; set; } = DataSourceType.Database;
     }
 }

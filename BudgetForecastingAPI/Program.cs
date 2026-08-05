@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using BudgetForecastingAPI.Data;
 using BudgetForecastingAPI.Services;
+using BudgetForecastingAPI.Services.Providers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Katman 2: Bütçe tahmin servisini DI container'a kaydediyoruz
+
+builder.Services.AddScoped<IBudgetDataProvider, DbBudgetDataProvider>();
+builder.Services.AddHttpClient<IBudgetDataProvider, ExternalApiBudgetDataProvider>();
 builder.Services.AddScoped<IBudgetPredictionService, BudgetPredictionManager>();
+
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
