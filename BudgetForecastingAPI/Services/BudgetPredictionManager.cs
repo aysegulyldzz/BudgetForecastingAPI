@@ -1,8 +1,5 @@
-using System;
-using System.Linq;
 using BudgetForecastingAPI.DTOs;
 using BudgetForecastingAPI.Services.Providers;
-using Npgsql;
 
 namespace BudgetForecastingAPI.Services
 {
@@ -36,9 +33,9 @@ namespace BudgetForecastingAPI.Services
                 throw new KeyNotFoundException($"Ilgili kaynaktan {targetName} icin gecerli veri alinamadi.");
             }
 
-            double w1 = request.ExpectedInflation / 100.0;
-            double w2 = request.ExpectedUsdIncrease / 100.0;
-            double w3 = request.ExpectedGoldIncrease / 100.0;
+            double w1 = request.ExpectedInflation.Value / 100.0;
+            double w2 = request.ExpectedUsdIncrease.Value / 100.0;
+            double w3 = request.ExpectedGoldIncrease.Value / 100.0;
 
             double multiplier = 1.0;
 

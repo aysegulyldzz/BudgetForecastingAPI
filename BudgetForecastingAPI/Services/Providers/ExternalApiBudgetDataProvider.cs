@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+﻿using System.Net;
 using BudgetForecastingAPI.Enums;
 using BudgetForecastingAPI.Models;
+using BudgetForecastingAPI.Exceptions;
 
 
 
@@ -22,14 +19,41 @@ namespace BudgetForecastingAPI.Services.Providers
 
         public async Task<List<HistoricalBudgetData>> GetHistoricalBudgetsAsync(string departmentName)
         {
-            var response = await _httpClient.GetFromJsonAsync<List<HistoricalBudgetData>>($"https://api.haricisirket.xyz.gg/budgets?department={departmentName}");
-
-            if (response == null || response.Count == 0)
+            try
             {
-                throw new KeyNotFoundException($"Dis API servisinden ({departmentName}) icin gecmis veriler alinamadi");
-            }
+                string departmentNameSafe = Uri.EscapeDataString(departmentName);
+                var response = await _httpClient.GetAsync($"budgets?epartment={departmentNameSafe}");
 
-            return response;
+                if (!response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        throw new ExternalApiException(ExternalApiErrorCode.DataNotFound);
+                    }
+                    throw new ExternalApiException(ExternalApiErrorCode.ServiceError);
+                }
+
+                var data = await response.Content.ReadFromJsonAsync<List<HistoricalBudgetData>>();
+
+                if (data == null || !data.Any())
+                {
+                    throw new ExternalApiException(ExternalApiErrorCode.DataNotFound);
+                }
+
+                return data;
+            }
+            catch(ExternalApiException)
+            {
+                throw;
+            }
+            catch(TaskCanceledException)
+            {
+                throw new ExternalApiException(ExternalApiErrorCode.Timeout);
+            }
+            catch(HttpRequestException)
+            {
+                throw new ExternalApiException(ExternalApiErrorCode.ConnectionFailed);
+            }
         }
     }
 }
