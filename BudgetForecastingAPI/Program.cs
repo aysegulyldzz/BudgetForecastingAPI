@@ -1,18 +1,31 @@
 using Microsoft.EntityFrameworkCore;
 using BudgetForecastingAPI.Data;
 using BudgetForecastingAPI.Services;
+using BudgetForecastingAPI.Services.Providers;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow;
+});
 
 // Veritabanı servisini ve PostgreSQL bağlantısını sisteme kaydediyoruz
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Katman 2: Bütçe tahmin servisini DI container'a kaydediyoruz
+
+builder.Services.AddScoped<IBudgetDataProvider, DbBudgetDataProvider>();
+builder.Services.AddHttpClient<IBudgetDataProvider, ExternalApiBudgetDataProvider>(client =>
+{
+    client.BaseAddress = new Uri("https://api.haricisirket.xyz.gg/");
+    client.Timeout = TimeSpan.FromSeconds(20);
+});
 builder.Services.AddScoped<IBudgetPredictionService, BudgetPredictionManager>();
+
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
